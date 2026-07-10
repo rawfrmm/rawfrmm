@@ -15,13 +15,15 @@ jobs:
           GH_TOKEN: ${{ secrets.STATS_TOKEN || github.token }}
         run: |
           LOGIN="rawfrmm"
+          FULL=0
           LIST=$(gh api "user/repos?per_page=100&affiliation=owner" --paginate 2>/dev/null || true)
           if echo "$LIST" | jq -e 'type=="array"' >/dev/null 2>&1; then
             REPOS=$(echo "$LIST" | jq -r '.[].full_name')
-            echo "using authenticated repo list (private included)"
+            FULL=1
+            echo "authenticated list: private repos included"
           else
             REPOS=$(gh api "users/$LOGIN/repos?per_page=100" --paginate --jq '.[].full_name')
-            echo "using public repo list only (add STATS_TOKEN secret for private repos)"
+            echo "public-only list: refusing to update card (add STATS_TOKEN secret to enable full counts)"
           fi
           TOTAL_A=0; TOTAL_D=0; TOTAL_C=0
           for R in $REPOS; do
@@ -41,15 +43,16 @@ jobs:
             echo "$R commits=$C adds=$A dels=$D"
             TOTAL_A=$((TOTAL_A+A)); TOTAL_D=$((TOTAL_D+D)); TOTAL_C=$((TOTAL_C+C))
           done
-          echo "totals commits=$TOTAL_C adds=$TOTAL_A dels=$TOTAL_D"
+          echo "totals commits=$TOTAL_C adds=$TOTAL_A dels=$TOTAL_D full=$FULL"
+          echo "FULL=$FULL"       >> "$GITHUB_ENV"
           echo "COMMITS=$TOTAL_C" >> "$GITHUB_ENV"
-          echo "ADDS=$TOTAL_A" >> "$GITHUB_ENV"
-          echo "DELS=$TOTAL_D" >> "$GITHUB_ENV"
+          echo "ADDS=$TOTAL_A"    >> "$GITHUB_ENV"
+          echo "DELS=$TOTAL_D"    >> "$GITHUB_ENV"
       - name: Generate card
-        if: env.COMMITS != '0'
+        if: env.FULL == '1' && env.COMMITS != '0'
         run: python3 generate_card.py --commits "$COMMITS" --adds "$ADDS" --dels "$DELS"
       - name: Commit if changed
-        if: env.COMMITS != '0'
+        if: env.FULL == '1' && env.COMMITS != '0'
         run: |
           git config user.name "rawform-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
