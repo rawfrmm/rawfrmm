@@ -19,15 +19,22 @@ jobs:
           TOTAL_A=0; TOTAL_D=0; TOTAL_C=0
           for R in $REPOS; do
             OUT=""
-            for i in 1 2 3 4 5; do
-              OUT=$(gh api "repos/$R/stats/contributors" 2>/dev/null || true)
-              [ -n "$OUT" ] && [ "$OUT" != "null" ] && [ "$OUT" != "[]" ] && break
-              sleep 4
+            for i in 1 2 3 4 5 6; do
+              RESP=$(gh api "repos/$R/stats/contributors" 2>/dev/null || true)
+              if echo "$RESP" | jq -e 'type=="array" and length>0' >/dev/null 2>&1; then
+                OUT="$RESP"; break
+              fi
+              sleep 5
             done
-            [ -z "$OUT" ] && continue
-            read A D C < <(echo "$OUT" | jq -r --arg u "$LOGIN" '[.[] | select(.author.login==$u)] | [([.[].weeks[].a]|add)//0,([.[].weeks[].d]|add)//0,([.[].total]|add)//0] | @tsv' | tr '\t' ' ')
+            [ -z "$OUT" ] && { echo "skip $R (no stats)"; continue; }
+            read A D C < <(echo "$OUT" | jq -r --arg u "$LOGIN" \
+              '[.[] | select(.author.login==$u)]
+               | [([.[].weeks[].a]|add)//0, ([.[].weeks[].d]|add)//0, ([.[].total]|add)//0]
+               | @tsv' | tr '\t' ' ')
+            echo "$R commits=$C adds=$A dels=$D"
             TOTAL_A=$((TOTAL_A+A)); TOTAL_D=$((TOTAL_D+D)); TOTAL_C=$((TOTAL_C+C))
           done
+          echo "totals commits=$TOTAL_C adds=$TOTAL_A dels=$TOTAL_D"
           echo "COMMITS=$TOTAL_C" >> "$GITHUB_ENV"
           echo "ADDS=$TOTAL_A" >> "$GITHUB_ENV"
           echo "DELS=$TOTAL_D" >> "$GITHUB_ENV"
