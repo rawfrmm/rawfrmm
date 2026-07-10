@@ -86,6 +86,6 @@
 <text x="504" y="378" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="12.5" xml:space="preserve"><tspan class="m">Pinterest......</tspan><tspan class="t">  @rawfrmm</tspan></text>
 <text class="t" x="504" y="410" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="13.5" font-weight="bold" xml:space="preserve">My Stats</text>
 <line class="s" x1="504" y1="420" x2="904" y2="420" stroke-width="1"/>
-<text x="504" y="437" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="12.5" xml:space="preserve"><tspan class="m">Commits........</tspan><tspan class="t">  13</tspan></text>
-<text x="504" y="457" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="12.5" xml:space="preserve"><tspan class="m">Lines of Code..</tspan><tspan class="t">  322 ( </tspan><tspan class="g">529++</tspan><tspan class="t"> / </tspan><tspan class="r">207--</tspan><tspan class="t"> )</tspan></text>
+<text x="504" y="437" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="12.5" xml:space="preserve"><tspan class="m">Commits........</tspan><tspan class="t">  194</tspan></text>
+<text x="504" y="457" font-family="Consolas,'Cascadia Mono',ui-monospace,monospace" font-size="12.5" xml:space="preserve"><tspan class="m">Lines of Code..</tspan><tspan class="t">  59,061 ( </tspan><tspan class="g">107,924++</tspan><tspan class="t"> / </tspan><tspan class="r">48,863--</tspan><tspan class="t"> )</tspan></text>
 </svg>
