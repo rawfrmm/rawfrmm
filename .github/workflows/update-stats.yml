@@ -15,7 +15,14 @@ jobs:
           GH_TOKEN: ${{ secrets.STATS_TOKEN || github.token }}
         run: |
           LOGIN="rawfrmm"
-          REPOS=$(gh api user/repos --paginate --jq '.[].full_name' 2>/dev/null || gh api users/$LOGIN/repos --paginate --jq '.[].full_name')
+          LIST=$(gh api "user/repos?per_page=100&affiliation=owner" --paginate 2>/dev/null || true)
+          if echo "$LIST" | jq -e 'type=="array"' >/dev/null 2>&1; then
+            REPOS=$(echo "$LIST" | jq -r '.[].full_name')
+            echo "using authenticated repo list (private included)"
+          else
+            REPOS=$(gh api "users/$LOGIN/repos?per_page=100" --paginate --jq '.[].full_name')
+            echo "using public repo list only (add STATS_TOKEN secret for private repos)"
+          fi
           TOTAL_A=0; TOTAL_D=0; TOTAL_C=0
           for R in $REPOS; do
             OUT=""
